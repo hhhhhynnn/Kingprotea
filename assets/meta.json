@@ -1,0 +1,10 @@
+{
+  "frames": 128,
+  "cell_w": 507,
+  "cell_h": 170,
+  "cols": 8,
+  "rows": 16,
+  "frame_ms": 30,
+  "scroll_px_per_frame": 4,
+  "source_canvas": 512
+}
