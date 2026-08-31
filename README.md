@@ -1,5 +1,5 @@
 # !?区区？！
-King Protea 在 Windows 桌面边缘爬来爬去的小挂件。透明背景、置顶，可以同时放
+KingProtea 在 Windows 桌面边缘爬来爬去的小挂件。透明背景、置顶，可以同时放
 最多 10 只，大小和速度实时可调。
 
 ![截图](docs/screenshot.png)
