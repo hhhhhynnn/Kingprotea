@@ -31,16 +31,6 @@ pip install Pillow
 tkinter 是标准库自带的。如果是从 python.org 装的 Python，安装时勾选了
 "tcl/tk and IDLE"（默认勾选）就有；Anaconda 也自带。除 Pillow 外没有别的依赖。
 
-## 自己打包 exe
-
-```bash
-pip install pyinstaller
-py tools/build_exe.py
-```
-
-产物在 `dist/KingProtea/`，整个文件夹压缩成 zip 就是可分发的包。
-用的是 onedir 模式而不是单文件——单文件每次启动都要把几十兆解压到临时目录，
-要多等好几秒，杀毒软件也更容易误报。
 
 三个滑块都是实时生效的：
 
@@ -73,7 +63,7 @@ py tools/build_exe.py
   下控件和文字的比例一致。
 - **多显示器只用主显示器**。她只在主屏的四条边上爬，不会跑到副屏去。
 
-## 她怎么爬
+## 怎么爬
 
 沿着屏幕的某一条边直线爬过去，**不拐弯**。整个身子爬出屏幕后，随机换一个角落、
 随机换一个方向重新钻进来。比如从左下角沿左边向上爬出去之后，下一趟可能从右下角
@@ -83,37 +73,6 @@ py tools/build_exe.py
 爬出去到再出现之间会随机歇 1.5 ~ 5 秒——想让她们不间断地爬，把 `console.py`
 顶部的 `WAIT_MIN, WAIT_MAX` 改成 `0, 0` 就行。
 
-## 配色
-
-窗口配色不是凭感觉调的，是从 `assets/sprite.png` 里她本人的像素统计出来的：
-
-| 用途 | 色值 | 来源 |
-| --- | --- | --- |
-| 主调发色 | `#C5AEE1` | 紫色像素的中位数，用作标题栏和滑轨 |
-| 发丝高光 | `#D8C3F2` | 92 分位 |
-| 粉紫 | `#D8B8E8` | 裙摆和发梢那一层，占全图 6% |
-| 发影 | `#8F77B0` | 12 分位，用作主按钮和强调文字 |
-| 蕾丝白 | `#FFFFFF` | 占比最高的一档 |
-
-Windows 11 的标题栏是通过 DWM 接口染的色（`DwmSetWindowAttribute`），
-系统不支持时会自动退回默认样式，不影响使用。
-
-## 文件
-
-| 文件 | 说明 |
-| --- | --- |
-| `console.py` | 控制窗口 + 随机换角落的爬法。**主程序** |
-| `pet.py` | 素材加载和全局热键（被 console.py 复用）。单独运行是旧的绕边框转圈模式，会平滑过四个角 |
-| `tools/build_exe.py` | 打包成免安装 exe |
-| `assets/sprite.png` | 8×16 精灵图集，128 帧，原生 507×170 一帧 |
-| `assets/meta.json` | 图集的帧数、单元格尺寸、帧间隔等参数 |
-| `assets/portrait.png` | 立绘原图，头像从这里裁 |
-| `assets/avatar.png` | 圆形头像，窗口左上角那个 |
-| `assets/icon.png` | 方形图标，标题栏和任务栏 |
-| `docs/screenshot.png` | README 里那张截图 |
-| `LICENSE` | 代码 MIT，美术素材不在授权范围内 |
-
-单独跑旧的绕圈模式：`py pet.py --size 240 --speed 1.0`。
 
 ## 实现要点
 
@@ -154,4 +113,3 @@ Windows 11 的标题栏是通过 DWM 接口染的色（`DwmSetWindowAttribute`�
 角色美术，版权归原公司所有，本仓库只是个人练习性质的二次利用，不在开源许可
 范围内。代码部分是 MIT，详见 [LICENSE](LICENSE)。
 
-如需商用请自行替换 `assets/` 下的素材。
