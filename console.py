@@ -145,7 +145,7 @@ class Crawler:
         self.label.bind('<Button-1>', lambda e: app.toggle())
         self.label.bind('<Button-3>', lambda e: app.show_console())
         self.current = None                       # 撑住 PhotoImage，别让它被回收
-        self.i = random.randrange(len(app.fr.frames))
+        self.i = float(random.randrange(len(app.fr.frames)))
         self.route = None
         self.wait = random.uniform(0.0, WAIT_MAX)  # 错开出场时间，免得十只一起冒头
         self.win.withdraw()
@@ -169,7 +169,11 @@ class Crawler:
                 return
             self.start_run(fr)                    # 起跑这一帧就画出来，不空一拍
         else:
-            self.i = (self.i + 1) % len(fr.frames)
+            # 动画帧率必须和位移一起缩放，否则会滑步。
+            # 窗口是匀速走的，但身体的伸缩本身带着起伏（头每帧能从 0 窜到 17px），
+            # 两者叠加才是原动画的动作。只放大位移、不放大帧率的话，匀速那部分
+            # 占比越来越大，起伏被稀释，速度一高就变成整个人平移过去。
+            self.i = (self.i + speed) % len(fr.frames)
             self.t += fr.step * speed
             if self.t - fr.dw / 2.0 > self.route[4]:   # 尾巴也出了屏幕，歇一会儿再来
                 self.route = None
@@ -182,7 +186,7 @@ class Crawler:
         gy = origin[1] + dirv[1] * self.t
         nx, ny = inward_normal(phi)
         w, h = fr.size_at(phi)
-        self.current = fr.photo(self.i, phi, mirror)
+        self.current = fr.photo(int(self.i), phi, mirror)
         self.label.configure(image=self.current)
         self.win.geometry('%dx%d+%d+%d' % (
             w, h,
@@ -334,7 +338,7 @@ class Console:
             im.paste(f, (0, 0), f)
             self.stage_src.append(im)
         self.stage_cache = [None] * len(src)
-        self.stage_i = 0
+        self.stage_i = 0.0
         self.stage = tk.Label(body, bg=STAGE, bd=0, highlightthickness=0)
         self.stage.grid(row=1, column=0, columnspan=3, pady=(0, self.px(12)))
 
@@ -355,10 +359,11 @@ class Console:
             pass
 
     def stage_step(self):
-        self.stage_i = (self.stage_i + 1) % len(self.stage_src)
-        ph = self.stage_cache[self.stage_i]
+        self.stage_i = (self.stage_i + self.speed) % len(self.stage_src)
+        k = int(self.stage_i)
+        ph = self.stage_cache[k]
         if ph is None:
-            ph = self.stage_cache[self.stage_i] = ImageTk.PhotoImage(self.stage_src[self.stage_i])
+            ph = self.stage_cache[k] = ImageTk.PhotoImage(self.stage_src[k])
         self.stage.configure(image=ph)
 
     def show_value(self, name):

@@ -141,7 +141,7 @@ class Pet:
         sw, sh = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
         self.path = Path(sw, sh, args.margin, args.corner or round(args.size * 0.8))
         self.s = args.start * self.path.P
-        self.i = 0
+        self.i = 0.0
         self.paused = False
         self.cache = {}
         self.current = None
@@ -198,14 +198,15 @@ class Pet:
                     pass
 
         if not self.paused:
+            # 帧率必须和位移一起缩放，否则速度一高就滑步，详见 console.py 里的说明
             self.s += self.step * self.speed * (-1 if self.reverse else 1)
-            self.i = (self.i + 1) % len(self.frames)
+            self.i = (self.i + self.speed) % len(self.frames)
 
         (px, py), phi = self.path.at(self.s)
         nx, ny = inward_normal(phi)
         # 必须自己抓住引用：PhotoImage 一旦被回收，Tk 那边的图也跟着没了，
         # Label 会变成空白（圆弧上的角度不进缓存，只有这里持有它）。
-        img = self.current = self.photo(self.i, phi)
+        img = self.current = self.photo(int(self.i), phi)
         cx, cy = px + nx * self.dh / 2, py + ny * self.dh / 2
         self.label.configure(image=img)
         self.root.geometry('%dx%d+%d+%d' % (img.width(), img.height(),
